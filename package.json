@@ -1,0 +1,15 @@
+{
+  "name": "banco-vele",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Banco di Regolazione Vele: simulatore didattico di regolazione",
+  "scripts": {
+    "start": "serve . -l ${PORT:-3000}"
+  },
+  "dependencies": {
+    "serve": "14.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
