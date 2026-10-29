@@ -14,7 +14,7 @@
 :root {
   --paper: #FFFFFF; --grid: rgba(10,22,38,0.06); --surface: #FFFFFF; --ink: #0A1626; --muted: #5B6B7C; --line: #D3DCE4;
   --wind: #0B5FA5; --app: #B45309; --boat: #0A1626; --sail: #E6EFF7; --sail-edge: #0A1626;
-  --ok: #0B5FA5; --luff: #15803D; --stall: #D62828; --drag: #6D28D9;
+  --gen: #0F766E; --ok: #0B5FA5; --luff: #15803D; --stall: #D62828; --drag: #6D28D9;
   --inst: #D3DCE4; --inst-tile: #FFFFFF; --inst-track: #E6EFF7; --inst-ink: #0A1626; --inst-dim: #5B6B7C; --inst-acc: #0B5FA5;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --body: "Barlow", system-ui, sans-serif;
@@ -23,12 +23,12 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --paper: #0A1626; --grid: rgba(255,255,255,0.045); --surface: #0E1D31; --ink: #F2F6FA; --muted: #8FA3B8; --line: #22344A;
   --wind: #5CC8E8; --app: #F2994A; --boat: #F2F6FA; --sail: #1A2E46; --sail-edge: #F2F6FA;
-  --ok: #5CC8E8; --luff: #4ADE80; --stall: #FF6B6B; --drag: #B59AF5;
+  --gen: #5EEAD4; --ok: #5CC8E8; --luff: #4ADE80; --stall: #FF6B6B; --drag: #B59AF5;
   --inst: #22344A; --inst-tile: #0E1D31; --inst-track: #22344A; --inst-ink: #F2F6FA; --inst-dim: #8FA3B8; --inst-acc: #5CC8E8; color-scheme: dark } }
 :root[data-theme="dark"] {
   --paper: #0A1626; --grid: rgba(255,255,255,0.045); --surface: #0E1D31; --ink: #F2F6FA; --muted: #8FA3B8; --line: #22344A;
   --wind: #5CC8E8; --app: #F2994A; --boat: #F2F6FA; --sail: #1A2E46; --sail-edge: #F2F6FA;
-  --ok: #5CC8E8; --luff: #4ADE80; --stall: #FF6B6B; --drag: #B59AF5;
+  --gen: #5EEAD4; --ok: #5CC8E8; --luff: #4ADE80; --stall: #FF6B6B; --drag: #B59AF5;
   --inst: #22344A; --inst-tile: #0E1D31; --inst-track: #22344A; --inst-ink: #F2F6FA; --inst-dim: #8FA3B8; --inst-acc: #5CC8E8; color-scheme: dark }
 
 body { background-color: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 40px 40px;
@@ -114,6 +114,9 @@ footer p { margin: 0; }
 .ro span { font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--inst-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ro b { font: 600 22px var(--display); color: var(--inst-ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .ctl .hint { font-size: 11.5px; line-height: 1.35; }
+.toggle { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--gen); margin: 0; }
+.group.off .ctl { opacity: .45; }
 .sidewrap { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 @media (max-width: 1100px) { .sidewrap { grid-template-columns: minmax(0, 1fr); } }
 .mini { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -163,6 +166,12 @@ footer p { margin: 0; }
     <div id="gMain" class="ctls"></div>
   </section>
 
+  <section class="group" aria-label="Gennaker" id="genBox">
+    <h2>Gennaker <small>70 m² · stima</small></h2>
+    <label class="toggle"><input type="checkbox" id="genUp"> Alza il gennaker (il fiocco si avvolge)</label>
+    <div id="gGenk" class="ctls"></div>
+  </section>
+
   <section class="group" aria-label="Fiocco">
     <h2>Fiocco <small>25,5 m²</small></h2>
     <div class="ro" id="roJ"></div>
@@ -209,6 +218,7 @@ footer p { margin: 0; }
         <span><i style="background:var(--wind)"></i>Vento reale</span>
         <span><i style="background:var(--app)"></i>Vento apparente</span>
         <span><i style="background:var(--boat)"></i>Velocità barca</span>
+        <span><i style="background:var(--gen)"></i>Gennaker</span>
       </div>
     </section>
     <section class="card">
@@ -251,7 +261,8 @@ footer p { margin: 0; }
   <footer>
     <p>Come è costruito. Le forze delle vele seguono il VPP ORC: coefficienti di portanza e resistenza di randa e fiocco in funzione dell'angolo del vento apparente, resistenza indotta con KPP (0,016 randa, 0,017 fiocco) e altezza efficace del piano velico, resistenza aerodinamica di albero, scafo ed equipaggio, copertura del fiocco in poppa. Quei coefficienti valgono a regolazione ideale. I comandi di bordo cambiano la forma delle vele e le vele, divise in otto sezioni, dicono quanto la regolazione reale si scosta da quella ideale: incidenza, concavità, posizione del grasso, svergolamento rispetto al gradiente del vento, interazione tra fiocco e randa.</p>
     <p>Taratura. Lo scafo (resistenza d'onda e d'attrito, stabilità) e l'altezza efficace sono tarati sul certificato ORC di un First 31.7: scarto medio del 3% su angolo e VMG di bolina e velocità a 52° e 60°. Da 110° in su il certificato usa lo spinnaker, quindi non è confrontabile. Con vento sopra i 16 nodi il modello è un po' più veloce del certificato.</p>
-    <p>Riferimenti. ORC VPP Documentation 2023 e tabelle dei coefficienti riportate da Borba Labi (2019) su base ORC 2017. Effetti dei comandi e forme obiettivo: B. Gladstone, <i>Trim</i>, North U. Non modella onda, spinnaker e planata.</p>
+    <p>Riferimenti. ORC VPP Documentation 2023 e tabelle dei coefficienti riportate da Borba Labi (2019) su base ORC 2017. Effetti dei comandi e forme obiettivo: B. Gladstone, <i>Trim</i>, North U. Non modella onda, spinnaker simmetrico e planata.</p>
+    <p>Gennaker. Area di 70 m² stimata per una barca di 9,5 m e coefficienti approssimati sull'andamento delle tabelle ORC per gli asimmetrici: i valori assoluti con il gennaker sono indicativi, i confronti tra regolazioni restano validi. Quando è alzato il fiocco si considera avvolto.</p>
   </footer>
 </main>
 </div>
@@ -303,6 +314,7 @@ function sailPolar(a, f, aws, dp, dpI, dStall) {
 // Dai comandi alla forma delle vele.
 // c: {bs, m:{sheet,car,vang,base,hal,cunn}, j:{sheet,lead,barber,inner,hal}}; % (scotte: 100 = cazzata a ferro), carrello randa in gradi
 function rigShape(c, tws, twa) {
+  const g = c.g || { up: 0, sheet: 50, tack: 50 };
   const load = tws * KN * (1 + 0.35 * Math.cos(twa * D2R));       // stima del vento apparente (nodi)
   const L = Math.max(0, load - 10);
   const bs = c.bs / 100, m = c.m, j = c.j;
@@ -329,7 +341,9 @@ function rigShape(c, tws, twa) {
   const jDp = clampv(0.33 + 0.005 * L + 0.03 * sag - 0.10 * jh, 0.25, 0.6);
   return {
     main: { beta: clampv(mB0, -10, 85), twist: mTwist, f0: mF0, f1: mF1, dp: mDp, clamp: mB0 > 85 ? 1 : 0 },
-    jib: { beta: Math.min(jCap, jB0), twist: jTwist, f0: jF0, f1: jF1, dp: jDp, clamp: jB0 > jCap ? 1 : 0, lead: leadAng }
+    jib: { beta: Math.min(jCap, jB0), twist: jTwist, f0: jF0, f1: jF1, dp: jDp, clamp: jB0 > jCap ? 1 : 0, lead: leadAng },
+    // gennaker: la scotta apre la bugna (angolo della corda), la mura (tack line) alza il punto di mura e libera l'inferitura
+    gen: { up: g.up ? 1 : 0, beta: 15 + (100 - g.sheet) * 0.9, tack: g.tack }
   };
 }
 
@@ -346,6 +360,11 @@ const ORC_MAIN = [[0, 0, 0.0431], [7, 0.86207, 0.02586], [9, 1.05172, 0.02328], 
 const ORC_JIB = [[0, 0, 0.05], [7, 0, 0.05], [15, 1.1, 0.032], [20, 1.475, 0.031], [27, 1.5, 0.037], [50, 1.45, 0.25],
   [60, 1.25, 0.35], [100, 0.4, 0.73], [150, 0, 0.95], [180, -0.1, 0.9]];
 const ORC_KPP = { main: 0.016, jib: 0.017 };
+// Gennaker (spinnaker asimmetrico) su bompresso: coefficienti approssimati sull'andamento delle tabelle ORC per gli asimmetrici.
+// L'area è una stima per un 9,5 m: va sostituita con quella del certificato della barca.
+const GEN_AREA = 70, GEN_ZCE = 5.2;
+const ORC_GEN = [[0, 0, 0.10], [28, 0, 0.10], [41, 1.30, 0.20], [50, 1.42, 0.28], [60, 1.48, 0.36], [70, 1.48, 0.43], [80, 1.44, 0.49],
+  [100, 1.27, 0.60], [115, 1.05, 0.72], [130, 0.78, 0.84], [150, 0.45, 0.95], [170, 0.18, 1.0], [180, 0.08, 1.0]];
 function orcCoef(tab, awa) {
   const a = clampv(Math.abs(awa), 0, 180);
   for (let i = 1; i < tab.length; i++) if (a <= tab[i][0]) {
@@ -396,14 +415,15 @@ function sailSections(k, V, phi, s, extra) {
 // VPP ORC "puro" (regolazione implicita): vele sempre regolate al meglio, depotenziate solo con il parametro flat
 function forcesORC(V, phi, s) {
   const aRef = apparent(5.5, V, phi, s.tws, s.twa), awa = aRef.awa, qr = 0.5 * RHO_A * aRef.aws * aRef.aws, flat = s.orcFlat;
-  const Am = 0.54 * SAILS.main.foot * (SAILS.main.zt - SAILS.main.zb), Aj = 0.54 * SAILS.jib.foot * (SAILS.jib.zt - SAILS.jib.zb);
-  const bk = 1 - 0.8 * clampv((awa - 140) / 30, 0, 1);
-  const [lm, dm] = orcCoef(ORC_MAIN, awa), [lj, dj] = orcCoef(ORC_JIB, awa);
+  const Am = 0.54 * SAILS.main.foot * (SAILS.main.zt - SAILS.main.zb), Aj = s.gen ? GEN_AREA : 0.54 * SAILS.jib.foot * (SAILS.jib.zt - SAILS.jib.zb);
+  const gU = !!s.gen;
+  const bk = gU ? 1 - 0.35 * clampv((awa - 150) / 30, 0, 1) : 1 - 0.8 * clampv((awa - 140) / 30, 0, 1);
+  const [lm, dm] = orcCoef(ORC_MAIN, awa), [lj, dj] = orcCoef(gU ? ORC_GEN : ORC_JIB, awa);
   const Aref = Am + Aj, CLc = flat * (lm * Am + lj * Aj * bk) / Aref, CD0c = (dm * Am + dj * Aj * bk) / Aref;
   const wl = Math.abs(lm) * Am + Math.abs(lj) * Aj * bk, KPP = wl > 0 ? (0.016 * Math.abs(lm) * Am + 0.017 * Math.abs(lj) * Aj * bk) / wl : 0.0165;
   const heff = heffORC(awa), CDi = (KPP + Aref / (Math.PI * heff * heff)) * CLc * CLc;
   const r = awa * D2R, CR = CLc * Math.sin(r) - (CD0c + CDi) * Math.cos(r), CH = CLc * Math.cos(r) + (CD0c + CDi) * Math.sin(r);
-  const zm = SAILS.main.zb + (SAILS.main.zt - SAILS.main.zb) / 3 + 0.024 * (SAILS.main.zt - SAILS.main.zb), zj = SAILS.jib.zb + (SAILS.jib.zt - SAILS.jib.zb) / 3;
+  const zm = SAILS.main.zb + (SAILS.main.zt - SAILS.main.zb) / 3 + 0.024 * (SAILS.main.zt - SAILS.main.zb), zj = gU ? GEN_ZCE : SAILS.jib.zb + (SAILS.jib.zt - SAILS.jib.zb) / 3;
   const zce = (zm * Am * Math.hypot(lm, dm) + zj * Aj * bk * Math.hypot(lj, dj)) / (Am * Math.hypot(lm, dm) + Aj * bk * Math.hypot(lj, dj)) * (1 - 0.203 * (1 - flat));
   const Dw = qr * windageCdA(awa);
   return { drive: qr * Aref * CR - Dw * Math.cos(r), side: qr * Aref * CH + Dw * Math.sin(r),
@@ -413,7 +433,8 @@ function forcesORC(V, phi, s) {
 function forces(V, phi, s, detail) {
   if (s.orcFlat !== undefined) return forcesORC(V, phi, s);
   const aRef = apparent(5.5, V, phi, s.tws, s.twa), awa = aRef.awa, qr = 0.5 * RHO_A * aRef.aws * aRef.aws;
-  const slot = clampv((115 - awa) / 35, 0, 1);                      // interazione tra le vele: dalla bolina al traverso
+  const GN = s.shape.gen, genUp = !!(GN && GN.up);
+  const slot = genUp ? 0 : clampv((115 - awa) / 35, 0, 1);                      // interazione tra le vele: dalla bolina al traverso
   // fiocco: l'upwash della randa gli fa vedere il vento un po' più largo
   const jSecs = sailSections('jib', V, phi, s, () => [5 * slot, 0, 2 * slot]);
   // randa: il fiocco la sventa (downwash), di più se la fessura tra le vele è stretta
@@ -426,6 +447,7 @@ function forces(V, phi, s, detail) {
   let Aref = 0, CLA = 0, CDA = 0, kppA = 0, zA = 0, wA = 0;
   const gam = new Array(8).fill(0), gamR = new Array(8).fill(0);
   for (const [k, secs, tab] of [['main', mSecs, ORC_MAIN], ['jib', jSecs, ORC_JIB]]) {
+    if (k === 'jib' && genUp) { sails.jib = { CL: 0, CD: 0, A: 0, Ae: 0, zce: 0 }; continue; }
     const [CL0, CD0] = orcCoef(tab, awa);
     let A = 0, dCL = 0, dCD = 0, zc = 0, zw = 0, effA = 0;
     for (const x of secs) A += x.A;
@@ -441,6 +463,22 @@ function forces(V, phi, s, detail) {
     sails[k] = { CL, CD, A, Ae, zce };
     Aref += A; CLA += CL * Ae; CDA += CD * Ae; kppA += ORC_KPP[k] * Math.abs(CL) * Ae; wA += Math.abs(CL) * Ae;
     zA += Math.hypot(CL, CD) * Ae * zce;
+  }
+  let genOut = null;
+  if (genUp) {
+    const [G0l, G0d] = orcCoef(ORC_GEN, awa), aw = apparent(GEN_ZCE, V, phi, s.tws, s.twa), alpha = aw.awa - GN.beta;
+    // regolazione: il massimo con l'inferitura che arriccia appena; troppo lascato si chiude, troppo cazzato stalla
+    let eff, st;
+    if (alpha < 8) { eff = 0.15; st = 'flog'; }
+    else if (alpha < 18) { eff = 0.15 + 0.85 * (alpha - 8) / 10; st = 'luff'; }
+    else if (aw.awa > 125) { eff = 1; st = 'drag'; }
+    else if (alpha <= 32) { eff = 1; st = 'ok'; }
+    else { eff = Math.max(0.35, 1 - 0.035 * (alpha - 32)); st = 'stall'; }
+    const ideal = clampv((115 - aw.awa) / 45, 0, 1), effT = 1 - 0.18 * Math.abs(GN.tack / 100 - ideal);   // mura: cazzata al lasco stretto, lascata in poppa
+    const blank = 1 - 0.35 * clampv((aw.awa - 150) / 30, 0, 1);                                           // coperto dalla randa in poppa piena
+    const CLg = G0l * eff * effT * blank, CDg = G0d * (0.6 + 0.4 * eff) * blank + (st === 'flog' ? 0.05 : 0), A = GEN_AREA;
+    Aref += A; CLA += CLg * A; CDA += CDg * A; kppA += 0.02 * Math.abs(CLg) * A; wA += Math.abs(CLg) * A; zA += Math.hypot(CLg, CDg) * A * GEN_ZCE;
+    genOut = { alpha, st, eff, effT, ideal, CL: CLg, CD: CDg, awa: aw.awa, beta: GN.beta, tack: GN.tack };
   }
   const CLc = CLA / Aref, CD0c = CDA / Aref, KPP = wA > 0 ? kppA / wA : 0.0165;
   // distribuzione del carico in altezza: se si scosta da quella ideale aumenta la resistenza indotta (svergolamento sbagliato)
@@ -459,7 +497,7 @@ function forces(V, phi, s, detail) {
   let out = null;
   if (detail) {
     const mk = (k, secs) => { const sh = s.shape[k]; return { beta: sh.beta, clamp: sh.clamp, secs, sh, CL: sails[k].CL, CD: sails[k].CD }; };
-    out = { main: mk('main', mSecs), jib: mk('jib', jSecs), eLoad: eRatio, CL: CLc, CD0: CD0c, CDi, heff, slot };
+    out = { main: mk('main', mSecs), jib: mk('jib', jSecs), gen: genOut, genUp, eLoad: eRatio, CL: CLc, CD0: CD0c, CDi, heff, slot };
   }
   return { drive, side, hm, detail: out };
 }
@@ -511,19 +549,20 @@ function solve(s) {
 
 function solveC(c, tws, twa) { return solve({ tws, twa, shape: rigShape(c, tws, twa) }); }
 // Velocità secondo il VPP ORC: sceglie il flat più veloce (da 0.42 a 1)
-function solveORC(tws, twa) {
+function solveORC(tws, twa, gen) {
   let best = null;
-  for (let fl = 1; fl >= 0.42 - 1e-9; fl -= 0.04) { const r = solve({ tws, twa, orcFlat: fl }); if (!best || r.V > best.V + 1e-6) best = r; }
+  for (let fl = 1; fl >= 0.42 - 1e-9; fl -= 0.04) { const r = solve({ tws, twa, orcFlat: fl, gen: gen ? 1 : 0 }); if (!best || r.V > best.V + 1e-6) best = r; }
   return best;
 }
 
 const CTLS = [
   ['bs', null, 0, 100], ['m', 'hal', 0, 100], ['m', 'cunn', 0, 100], ['m', 'vang', 0, 100], ['m', 'base', 0, 100],
-  ['m', 'car', -10, 16], ['m', 'sheet', 0, 100], ['j', 'sheet', 0, 100], ['j', 'lead', 0, 100], ['j', 'barber', 0, 100], ['j', 'inner', 0, 100], ['j', 'hal', 0, 100]
+  ['m', 'car', -10, 16], ['m', 'sheet', 0, 100], ['j', 'sheet', 0, 100], ['j', 'lead', 0, 100], ['j', 'barber', 0, 100], ['j', 'inner', 0, 100], ['j', 'hal', 0, 100],
+  ['g', 'sheet', 0, 100], ['g', 'tack', 0, 100]
 ];
 const getC = (c, g, k) => k ? c[g][k] : c[g];
 const setC = (c, g, k, v) => { if (k) c[g][k] = v; else c[g] = v; };
-const DEFAULT_C = { bs: 30, m: { hal: 50, cunn: 10, vang: 20, base: 50, car: 0, sheet: 92 }, j: { sheet: 84, lead: 50, barber: 0, inner: 0, hal: 50 } };
+const DEFAULT_C = { bs: 30, m: { hal: 50, cunn: 10, vang: 20, base: 50, car: 0, sheet: 92 }, j: { sheet: 84, lead: 50, barber: 0, inner: 0, hal: 50 }, g: { up: 0, sheet: 50, tack: 50 } };
 
 // Partenze diverse per non fermarsi in un ottimo locale (bolina, bolina depotenziata, lasco, poppa)
 const STARTS = [
@@ -582,10 +621,11 @@ function descend(c, tws, twa, passes, best) {
   }
   return best;
 }
-function optimizeC(tws, twa, passes = 3) {
+function optimizeC(tws, twa, passes = 3, up = 0) {
   let bestC = null, best = -1;
   for (const st of STARTS) {
-    const c = JSON.parse(JSON.stringify(st));
+    const c = JSON.parse(JSON.stringify(st)); c.g = { up: up ? 1 : 0, sheet: 50, tack: 50 };
+    if (up) { let bv = -1, bsh = 50; for (let gs = 0; gs <= 100; gs += 10) { c.g.sheet = gs; const v = score(c, tws, twa); if (v > bv) { bv = v; bsh = gs; } } c.g.sheet = bsh; }   // il gennaker ha una finestra stretta: si parte dalla scotta migliore
     let v = sheetGrid(c, tws, twa, 20);
     v = descend(c, tws, twa, 1, v);
     if (v > best) { best = v; bestC = c; }
@@ -614,6 +654,8 @@ function optimizeC(tws, twa, passes = 3) {
     { box: 'gJib', g: 'j', k: 'lead', id: 'c_jlead', label: 'Carrello fiocco', hint: 'Avanti: base più grassa e balumina chiusa, per vento leggero e onda. Indietro: base piatta e testa aperta, per depotenziare.' },
     { box: 'gJib', g: 'j', k: 'barber', id: 'c_jbar', label: 'Barber', hint: 'Porta il punto di scotta fuori e in basso. Serve al lasco: senza, lascando la bugna sale, la testa si apre troppo e la base si gonfia. Con aria leggerissima evita di soffocare il canale.' },
     { box: 'gJib', g: 'j', k: 'inner', id: 'c_jin', label: 'Inner', hint: 'Porta il punto di scotta verso l’interno: si stringe di più con vento medio e mare piatto, ma il canale con la randa si chiude. Non lavora se il barber è cazzato.' },
+    { box: 'gGenk', g: 'g', k: 'sheet', id: 'c_gsh', label: 'Scotta gennaker', hint: 'Lasca finché l’inferitura comincia ad arricciarsi, poi cazza appena: lì spinge di più. Se l’inferitura si chiude del tutto, cazza o poggia.' },
+    { box: 'gGenk', g: 'g', k: 'tack', id: 'c_gtack', label: 'Mura (tack line)', hint: 'Cazzata: punto di mura basso e inferitura tesa, per il lasco stretto. Lascata: la mura sale e l’inferitura ruota sopravento, per le andature larghe.' },
     { box: 'gJib', g: 'j', k: 'hal', id: 'c_jhal', label: 'Drizza fiocco', hint: 'Tesa: grasso avanti ed entrata tonda, più facile da timonare. Lasca: entrata fine, si stringe di più in acqua piatta.' }
   ];
   const fmt = (u, v) => u.k === 'car' ? (v < 0 ? Math.abs(v) + '° sopravento' : v > 0 ? v + '° sottovento' : 'al centro')
@@ -632,7 +674,7 @@ function optimizeC(tws, twa, passes = 3) {
 
   // copia compatta dei comandi accanto alla vista laterale: muove gli stessi comandi principali
   const MINI = [['Vento', [{ id: 'tws', label: 'Vento reale' }, { id: 'twa', label: 'Angolo al vento' }]],
-    ['Attrezzatura', UI.filter(u => u.box === 'gGen')], ['Randa', UI.filter(u => u.box === 'gMain')], ['Fiocco', UI.filter(u => u.box === 'gJib')]];
+    ['Attrezzatura', UI.filter(u => u.box === 'gGen')], ['Randa', UI.filter(u => u.box === 'gMain')], ['Fiocco', UI.filter(u => u.box === 'gJib')], ['Gennaker', UI.filter(u => u.box === 'gGenk')]];
   MINI.forEach(([title, list]) => {
     const h4 = document.createElement('h4'); h4.textContent = title; $('mini').appendChild(h4);
     const g = document.createElement('div'); g.className = 'mg';
@@ -644,6 +686,8 @@ function optimizeC(tws, twa, passes = 3) {
     });
     $('mini').appendChild(g);
   });
+  const gt = document.createElement('label'); gt.className = 'toggle'; gt.innerHTML = '<input type="checkbox" id="mini_genUp"> Alza il gennaker';
+  $('mini').appendChild(gt); $('mini_genUp').addEventListener('change', e => { $('genUp').checked = e.target.checked; update(); });
   const mb = document.createElement('div'); mb.className = 'btns';
   mb.innerHTML = '<button class="btn ghost" id="mini_ref" type="button">Usa come riferimento</button><button class="btn ghost" id="mini_reset" type="button">Ripristina</button>';
   $('mini').appendChild(mb);
@@ -653,9 +697,11 @@ function optimizeC(tws, twa, passes = 3) {
     MINI_IDS.forEach(id => { const m = $('mini_' + id); if (m !== document.activeElement) m.value = $(id).value; $('mini_' + id + 'O').textContent = $(id + 'O').textContent; });
   }
 
-  const readC = () => { const c = JSON.parse(JSON.stringify(DEFAULT_C)); UI.forEach(u => setC(c, u.g, u.k, parseFloat($(u.id).value))); return c; };
-  const writeC = c => UI.forEach(u => { $(u.id).value = Math.round(getC(c, u.g, u.k)); });
+  const readC = () => { const c = JSON.parse(JSON.stringify(DEFAULT_C)); UI.forEach(u => setC(c, u.g, u.k, parseFloat($(u.id).value))); c.g.up = $('genUp').checked ? 1 : 0; return c; };
+  const writeC = c => { UI.forEach(u => { $(u.id).value = Math.round(getC(c, u.g, u.k)); }); $('genUp').checked = !!(c.g && c.g.up); };
   const env = () => ({ tws: parseFloat($('tws').value) / KN, twa: parseFloat($('twa').value) });
+  const genOn = () => $('genUp').checked ? 1 : 0;
+  const keyNow = () => env().tws.toFixed(3) + '|' + env().twa + '|' + genOn();
 
   let cur = null, curC = null, opt = null, optKey = '', optTimer = 0, polarCur = [], polarOpt = [], polarKey = '', polarGen = 0;
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -707,13 +753,32 @@ function optimizeC(tws, twa, passes = 3) {
     x.strokeStyle = css('--muted'); x.lineWidth = 2; x.beginPath(); x.moveTo(...P(-1.1, ty)); x.lineTo(...P(1.1, ty)); x.stroke();
     const carPos = -Math.sin(curC.m.car * D2R) * 4.2;
     x.fillStyle = css('--boat'); const cp = P(Math.max(-1.1, Math.min(1.1, carPos)), ty); x.fillRect(cp[0] - 4, cp[1] - 3, 8, 6);
-    // fiocco
+    // fiocco (avvolto sullo strallo quando è alzato il gennaker)
     const jF = d.jib.secs[0], jT = d.jib.secs[d.jib.secs.length - 1];
-    let pts = sectionPts(...stay, cJ * 0.95, jF.chordAng, jF.f, jF.dp);
-    poly(x, pts); x.fillStyle = css('--sail'); x.globalAlpha = 0.85; x.fill(); x.globalAlpha = 1;
-    x.strokeStyle = css('--sail-edge'); x.lineWidth = 1.8; x.stroke();
-    pts = sectionPts(...stay, cJ * 0.6, jT.chordAng, jT.f, jT.dp);
-    x.setLineDash([4, 3]); poly(x, pts); x.lineWidth = 1.2; x.stroke(); x.setLineDash([]);
+    let pts;
+    if (!d.genUp) {
+      pts = sectionPts(...stay, cJ * 0.95, jF.chordAng, jF.f, jF.dp);
+      poly(x, pts); x.fillStyle = css('--sail'); x.globalAlpha = 0.85; x.fill(); x.globalAlpha = 1;
+      x.strokeStyle = css('--sail-edge'); x.lineWidth = 1.8; x.stroke();
+      pts = sectionPts(...stay, cJ * 0.6, jT.chordAng, jT.f, jT.dp);
+      x.setLineDash([4, 3]); poly(x, pts); x.lineWidth = 1.2; x.stroke(); x.setLineDash([]);
+    } else {
+      x.fillStyle = css('--sail-edge'); x.beginPath(); x.arc(...stay, 4.5, 0, Math.PI * 2); x.fill();
+      // bompresso e gennaker: sezione a metà altezza (piede pieno, testa tratteggiata e più aperta)
+      const bsp = P(0, -5.4), g = d.gen;
+      x.strokeStyle = css('--boat'); x.lineWidth = 2.5; x.beginPath(); x.moveTo(...bow); x.lineTo(...bsp); x.stroke();
+      pts = sectionPts(...bsp, 6.2 * sc, g.beta, 0.2, 0.45);
+      poly(x, pts); x.fillStyle = css('--gen'); x.globalAlpha = 0.16; x.fill(); x.globalAlpha = 1;
+      x.strokeStyle = css('--gen'); x.lineWidth = 2.2; x.stroke();
+      pts = sectionPts(...bsp, 4.2 * sc, g.beta + 12 + 10 * (1 - g.tack / 100), 0.18, 0.45);
+      x.setLineDash([4, 3]); x.lineWidth = 1.2; poly(x, pts); x.stroke(); x.setLineDash([]);
+      const gc = sectionPts(...bsp, 6.2 * sc, g.beta, 0.2, 0.45)[30];
+      x.strokeStyle = css('--muted'); x.lineWidth = 1; x.setLineDash([2, 2]); x.beginPath(); x.moveTo(...gc); x.lineTo(...P(-1.3, 4.3)); x.stroke(); x.setLineDash([]);
+      const gp = sectionPts(...bsp, 6.2 * sc, g.beta, 0.2, 0.45)[3];
+      x.fillStyle = stCol(g.st); x.beginPath(); x.arc(gp[0], gp[1], 8, 0, Math.PI * 2); x.fill();
+      x.strokeStyle = css('--surface'); x.lineWidth = 3; x.stroke();
+      x.strokeStyle = css('--ink'); x.lineWidth = 1.2; x.beginPath(); x.arc(gp[0], gp[1], 9.5, 0, Math.PI * 2); x.stroke();
+    }
     // punto di scotta del fiocco
     const la = d.jib.sh.lead * D2R, lr = cJ * (1.02 + 0.14 * (0.5 - curC.j.lead / 100)), lp = [stay[0] - Math.sin(la) * lr, stay[1] + Math.cos(la) * lr];
     x.fillStyle = css('--muted'); x.fillRect(lp[0] - 4, lp[1] - 4, 8, 8);
@@ -735,7 +800,8 @@ function optimizeC(tws, twa, passes = 3) {
       x.strokeStyle = css('--surface'); x.lineWidth = 3; x.stroke();
       x.strokeStyle = css('--ink'); x.lineWidth = 1.2; x.beginPath(); x.arc(pp[0], pp[1], 9.5, 0, Math.PI * 2); x.stroke();
     };
-    tell(d.jib.secs[3], d.jib, ...stay, cJ * 0.95); tell(d.main.secs[3], d.main, ...mast, cM * 0.95);
+    if (!d.genUp) tell(d.jib.secs[3], d.jib, ...stay, cJ * 0.95);
+    tell(d.main.secs[3], d.main, ...mast, cM * 0.95);
     const R = h * 0.46, kpx = R / 32, tws = s.tws * KN, twa = s.twa * D2R;
     const ux = Math.sin(twa), uy = -Math.cos(twa), lt = Math.max(30, tws * kpx);
     arrow(x, cx + ux * R, cy + uy * R, cx + ux * (R - lt), cy + uy * (R - lt), css('--wind'), 3, 11);
@@ -761,12 +827,12 @@ function optimizeC(tws, twa, passes = 3) {
       x.strokeStyle = css('--app'); x.globalAlpha = 0.8; x.lineWidth = 1.5; x.setLineDash([5, 4]);
       const rb = rs.main.beta * D2R, rbe = [mast[0] - Math.sin(rb) * cM, mast[1] + Math.cos(rb) * cM];
       x.beginPath(); x.moveTo(...mast); x.lineTo(...rbe); x.stroke();
-      poly(x, sectionPts(...stay, cJ * 0.95, rs.jib.beta + rs.jib.twist * 0.0625, rs.jib.f0, rs.jib.dp)); x.stroke();
+      if (!d.genUp) { poly(x, sectionPts(...stay, cJ * 0.95, rs.jib.beta + rs.jib.twist * 0.0625, rs.jib.f0, rs.jib.dp)); x.stroke(); }
       x.setLineDash([]); x.globalAlpha = 1;
       if (isMoved('m.car')) add(cp, 'right', ['CARRELLO RANDA', fmt(UI[2], refC.m.car).toUpperCase() + ' → ' + fmt(UI[2], curC.m.car).toUpperCase()], 9);
       if (Math.abs(d.main.sh.beta - rs.main.beta) >= 1.5) add(be, 'right', ['BOMA PIÙ ' + (d.main.sh.beta > rs.main.beta ? 'APERTO' : 'CHIUSO'), rs.main.beta.toFixed(0) + '° → ' + d.main.sh.beta.toFixed(0) + '°', ...byLines(['m.sheet', 'm.car'])]);
       if (Math.abs(d.jib.sh.lead - rs.jib.lead) >= 0.8) add(lp, 'left', ['PUNTO DI SCOTTA PIÙ ' + (d.jib.sh.lead > rs.jib.lead ? 'FUORI' : 'DENTRO'), rs.jib.lead.toFixed(0) + '° → ' + d.jib.sh.lead.toFixed(0) + '°', ...byLines(['j.barber', 'j.inner'])], 9);
-      if (Math.abs(d.jib.sh.beta - rs.jib.beta) >= 1.5) {
+      if (!d.genUp && Math.abs(d.jib.sh.beta - rs.jib.beta) >= 1.5) {
         const jp = sectionPts(...stay, cJ * 0.95, d.jib.secs[0].chordAng, d.jib.secs[0].f, d.jib.secs[0].dp)[30];
         add(jp, 'left', ['FIOCCO PIÙ ' + (d.jib.sh.beta > rs.jib.beta ? 'APERTO' : 'CHIUSO'), rs.jib.beta.toFixed(0) + '° → ' + d.jib.sh.beta.toFixed(0) + '°', ...byLines(['j.sheet', 'j.barber', 'j.inner'])]);
       }
@@ -790,7 +856,7 @@ function optimizeC(tws, twa, passes = 3) {
   // --- evidenza delle modifiche: riferimento, comandi cambiati, etichette ---
   let refC = JSON.parse(JSON.stringify(DEFAULT_C));
   const SHORT = { 'bs': 'paterazzo', 'm.sheet': 'scotta randa', 'm.car': 'carrello randa', 'm.vang': 'vang', 'm.base': 'base', 'm.hal': 'drizza randa',
-    'm.cunn': 'cunningham', 'j.sheet': 'scotta fiocco', 'j.lead': 'carrello fiocco', 'j.barber': 'barber', 'j.inner': 'inner', 'j.hal': 'drizza fiocco' };
+    'm.cunn': 'cunningham', 'j.sheet': 'scotta fiocco', 'j.lead': 'carrello fiocco', 'j.barber': 'barber', 'j.inner': 'inner', 'j.hal': 'drizza fiocco', 'g.sheet': 'scotta gennaker', 'g.tack': 'mura gennaker' };
   const valOf = (c, key) => { const [g, k] = key.split('.'); return k ? c[g][k] : c[g]; };
   const isMoved = key => Math.abs(valOf(curC, key) - valOf(refC, key)) >= (key === 'm.car' ? 2 : 5);
   // righe "da: …" con i comandi che hanno contribuito, spezzate per stare nel riquadro
@@ -908,24 +974,57 @@ function optimizeC(tws, twa, passes = 3) {
     x.strokeStyle = css('--boat'); x.lineWidth = 4;
     x.beginPath(); x.moveTo(...P(R.mastX(1.55), 1.55)); x.lineTo(...P(4.55, R.boomZ)); x.stroke();
     x.lineWidth = 5; curve(R.B, R.C, R.T); x.stroke();
-    // fiocco e strisce di grasso
-    jibPath(R); x.fillStyle = css('--sail'); x.globalAlpha = 0.94; x.fill(); x.globalAlpha = 1;
-    x.strokeStyle = css('--sail-edge'); x.lineWidth = 2; x.stroke();
-    JZ.forEach(z => { const s = jibStripe(R, z); drawStripe(s, css('--sail-edge'), 1.4, []); x.fillStyle = css('--sail-edge'); x.beginPath(); x.arc(s.dp[0], s.dp[1], 3, 0, Math.PI * 2); x.fill(); });
+    const GU = !!d.genUp;
+    if (!GU) {
+      // fiocco e strisce di grasso
+      jibPath(R); x.fillStyle = css('--sail'); x.globalAlpha = 0.94; x.fill(); x.globalAlpha = 1;
+      x.strokeStyle = css('--sail-edge'); x.lineWidth = 2; x.stroke();
+      JZ.forEach(z => { const s = jibStripe(R, z); drawStripe(s, css('--sail-edge'), 1.4, []); x.fillStyle = css('--sail-edge'); x.beginPath(); x.arc(s.dp[0], s.dp[1], 3, 0, Math.PI * 2); x.fill(); });
+    } else {
+      // fiocco avvolto sullo strallo
+      x.strokeStyle = css('--sail-edge'); x.lineWidth = 6; x.lineCap = 'round'; x.beginPath();
+      for (let z = 1.15; z <= 11.3; z += 0.4) { const q2 = P(...R.stay(z)); z === 1.15 ? x.moveTo(...q2) : x.lineTo(...q2); } x.stroke();
+    }
+    // gennaker sul bompresso: la mura lascata alza il punto di mura, la scotta lascata porta la bugna avanti e in alto
+    let GG = null;
+    if (GU) {
+      const g = d.gen, tk = g.tack / 100, open = (g.beta - 15) / 90;
+      const gT = [-4.35, 1.2 + 0.9 * (1 - tk)], gH = [R.mastX(12.2) - 0.1, 12.25], gC = [3.5 - 1.1 * open, 2.0 + 0.9 * open];
+      const gLc = [-4.9 - 0.6 * (1 - tk), 7.2], gEc = [2.9 - 0.8 * open, 7.6], gFc = [-0.5, 0.9 + 0.5 * open];
+      x.strokeStyle = css('--boat'); x.lineWidth = 3; x.beginPath(); x.moveTo(...P(...BOW)); x.lineTo(...P(-4.4, 1.1)); x.stroke();
+      x.beginPath(); x.moveTo(...P(...gT)); x.quadraticCurveTo(...P(...gLc), ...P(...gH)); x.quadraticCurveTo(...P(...gEc), ...P(...gC)); x.quadraticCurveTo(...P(...gFc), ...P(...gT)); x.closePath();
+      x.fillStyle = css('--gen'); x.globalAlpha = 0.14; x.fill(); x.globalAlpha = 1;
+      x.strokeStyle = css('--gen'); x.lineWidth = 2.2; x.stroke();
+      // mura (tack line) e scotta al bozzello di poppa
+      x.strokeStyle = css('--muted'); x.lineWidth = 1.2; x.beginPath(); x.moveTo(...P(-4.4, 1.1)); x.lineTo(...P(...gT)); x.stroke();
+      x.strokeStyle = css('--gen'); x.lineWidth = 1.6; x.beginPath(); x.moveTo(...P(...gC)); x.lineTo(...P(5.6, 0.95)); x.stroke();
+      // inferitura: dove si legge la regolazione (arriccia appena = giusto)
+      const lp = t => [qb(gT[0], gLc[0], gH[0], t), qb(gT[1], gLc[1], gH[1], t)];
+      const m = PAIR[g.st] || PAIR.ok, li = lp(0.5), [px, py] = P(li[0] + 0.6, li[1]);
+      streak(x, px, py - 5, css('--luff'), m[0], L); streak(x, px, py + 5, css('--stall'), m[1], L);
+      if (g.st === 'luff' || g.st === 'flog') {
+        x.strokeStyle = css('--luff'); x.lineWidth = 4; x.beginPath();
+        for (let t = 0.3; t <= 0.75; t += 0.05) { const q2 = P(...lp(t)); t === 0.3 ? x.moveTo(q2[0] + 6, q2[1]) : x.lineTo(q2[0] + 6 + 4 * Math.sin(t * 40), q2[1]); } x.stroke();
+      }
+      let q2 = P(...lp(0.62)); x.font = '600 11px ' + css('--mono'); x.fillStyle = css('--gen'); x.textAlign = 'right';
+      x.fillText('GENNAKER', Math.max(x.measureText('GENNAKER').width + 4, q2[0] - 8), q2[1]);
+      GG = { gT, gC };
+    }
     // regolazione di riferimento, tratteggiata in ambra
     if (anyMoved) {
       x.strokeStyle = css('--app'); x.globalAlpha = 0.8; x.lineWidth = 1.5; x.setLineDash([5, 4]);
       curve(G0.B, G0.C, G0.T); x.stroke(); curve(G0.S0, G0.SC, G0.S1); x.stroke();
-      curve(G0.mHead, G0.mCtl, G0.mClew); x.stroke(); curve(G0.jH, G0.jCtl, G0.jC); x.stroke();
+      curve(G0.mHead, G0.mCtl, G0.mClew); x.stroke(); if (!GU) { curve(G0.jH, G0.jCtl, G0.jC); x.stroke(); }
       x.beginPath(); x.moveTo(...P(G0.mastX(1.55), 1.55)); x.lineTo(...P(4.55, G0.boomZ)); x.stroke();
       x.setLineDash([]);
-      MZ.forEach(z => drawStripe(mainStripe(G0, z), css('--app'), 1.2, [4, 3])); JZ.forEach(z => drawStripe(jibStripe(G0, z), css('--app'), 1.2, [4, 3]));
+      MZ.forEach(z => drawStripe(mainStripe(G0, z), css('--app'), 1.2, [4, 3])); if (!GU) JZ.forEach(z => drawStripe(jibStripe(G0, z), css('--app'), 1.2, [4, 3]));
       x.globalAlpha = 1;
     }
     // rotaia e carrello del fiocco (più avanti = carrello avanti), scotta dalla bugna al carrello e al winch
     const jC = R.jC, carX = R.carX;
     x.strokeStyle = css('--muted'); x.lineWidth = 3; x.beginPath(); x.moveTo(...P(trA, deckZ(trA) + 0.04)); x.lineTo(...P(trB, deckZ(trB) + 0.04)); x.stroke();
     const cp = P(carX, deckZ(carX) + 0.08);
+    if (!GU) {
     x.strokeStyle = css('--wind'); x.lineWidth = 1.8;
     x.beginPath(); x.moveTo(...P(...jC)); x.lineTo(...cp); x.lineTo(...P(...winch)); x.stroke();
     x.fillStyle = css('--wind'); x.fillRect(cp[0] - 0.14 * sc, cp[1] - 3, 0.28 * sc, 7);
@@ -939,6 +1038,7 @@ function optimizeC(tws, twa, passes = 3) {
       const sp = R.stay(R.jT[1] + (R.jH[1] - R.jT[1]) * t), [px, py] = P(sp[0] + 0.45, sp[1]);
       streak(x, px, py - 5, css('--luff'), m[0], L); streak(x, px, py + 5, css('--stall'), m[1], L);
     });
+    }
     // filetti di balumina della randa, all'altezza delle stecche
     [2, 4, 6].forEach(i => {
       const sec = d.main.secs[i], st = stOf(sec, d.main), [px, py] = P(...R.mLeech(sec.z));
@@ -947,7 +1047,7 @@ function optimizeC(tws, twa, passes = 3) {
     });
     x.font = '600 11px ' + css('--mono'); x.fillStyle = css('--muted');
     let q = P(...BOW); x.textAlign = 'right'; x.fillText('PRUA', q[0] - 6, q[1] + 4);
-    q = P(carX, deckZ(carX)); x.textAlign = 'center'; x.fillStyle = css('--wind'); x.fillText('CARRELLO FIOCCO', q[0], q[1] + 22);
+    q = P(carX, deckZ(carX)); x.textAlign = 'center'; x.fillStyle = css('--wind'); if (!GU) x.fillText('CARRELLO FIOCCO', q[0], q[1] + 22);
     q = P(tvX, tvZ); x.fillStyle = css('--muted'); x.fillText('SCOTTA RANDA', q[0], q[1] + 38);
     if (!anyMoved) return;
     // dove cambia, rispetto alla regolazione di riferimento
@@ -963,17 +1063,28 @@ function optimizeC(tws, twa, passes = 3) {
     if (Math.abs(sN.main.dp - sR.main.dp) >= 0.015) add(ms[1].dp, 'right', ['GRASSO RANDA PIÙ ' + (sN.main.dp < sR.main.dp ? 'AVANTI' : 'INDIETRO'), 'POSIZIONE ' + pctTxt(sR.main.dp) + ' → ' + pctTxt(sN.main.dp), ...byLines(['m.hal', 'm.cunn', 'bs'])]);
     if (Math.abs(ms[2].f - mr[2].f) >= 0.006) add(ms[2].dp, 'right', ['TESTA RANDA PIÙ ' + (ms[2].f < mr[2].f ? 'PIATTA' : 'GRASSA'), 'PROFONDITÀ ' + pctTxt(mr[2].f) + ' → ' + pctTxt(ms[2].f), ...byLines(['bs', 'm.cunn'])]);
     const dJ = sN.jib.twist - sR.jib.twist;
-    if (Math.abs(dJ) >= 1.5) add(P(...R.jLeech(9.2)), 'left', ['TESTA FIOCCO ' + (dJ > 0 ? 'PIÙ APERTA' : 'PIÙ CHIUSA'), 'SVERGOLAMENTO ' + sR.jib.twist.toFixed(0) + '° → ' + sN.jib.twist.toFixed(0) + '°', ...byLines(['j.sheet', 'j.lead', 'j.barber', 'j.hal'])]);
+    if (!GU && Math.abs(dJ) >= 1.5) add(P(...R.jLeech(9.2)), 'left', ['TESTA FIOCCO ' + (dJ > 0 ? 'PIÙ APERTA' : 'PIÙ CHIUSA'), 'SVERGOLAMENTO ' + sR.jib.twist.toFixed(0) + '° → ' + sN.jib.twist.toFixed(0) + '°', ...byLines(['j.sheet', 'j.lead', 'j.barber', 'j.hal'])]);
     const js = JZ.map(z => jibStripe(R, z)), jr = JZ.map(z => jibStripe(G0, z));
-    if (Math.abs(js[0].f - jr[0].f) >= 0.006) add(js[0].dp, 'left', ['BASE FIOCCO PIÙ ' + (js[0].f < jr[0].f ? 'PIATTA' : 'GRASSA'), 'PROFONDITÀ ' + pctTxt(jr[0].f) + ' → ' + pctTxt(js[0].f), ...byLines(['j.lead', 'j.sheet', 'j.barber', 'bs', 'j.hal'])]);
-    if (Math.abs(sN.jib.dp - sR.jib.dp) >= 0.015) add(js[1].dp, 'left', ['GRASSO FIOCCO PIÙ ' + (sN.jib.dp < sR.jib.dp ? 'AVANTI' : 'INDIETRO'), 'POSIZIONE ' + pctTxt(sR.jib.dp) + ' → ' + pctTxt(sN.jib.dp), ...byLines(['j.hal', 'bs'])]);
-    if (isMoved('j.lead')) add(cp, 'left', ['CARRELLO FIOCCO ' + (curC.j.lead > refC.j.lead ? 'PIÙ AVANTI' : 'PIÙ INDIETRO')], 0.4 * sc);
+    if (!GU && Math.abs(js[0].f - jr[0].f) >= 0.006) add(js[0].dp, 'left', ['BASE FIOCCO PIÙ ' + (js[0].f < jr[0].f ? 'PIATTA' : 'GRASSA'), 'PROFONDITÀ ' + pctTxt(jr[0].f) + ' → ' + pctTxt(js[0].f), ...byLines(['j.lead', 'j.sheet', 'j.barber', 'bs', 'j.hal'])]);
+    if (!GU && Math.abs(sN.jib.dp - sR.jib.dp) >= 0.015) add(js[1].dp, 'left', ['GRASSO FIOCCO PIÙ ' + (sN.jib.dp < sR.jib.dp ? 'AVANTI' : 'INDIETRO'), 'POSIZIONE ' + pctTxt(sR.jib.dp) + ' → ' + pctTxt(sN.jib.dp), ...byLines(['j.hal', 'bs'])]);
+    if (GU && GG && isMoved('g.sheet')) add(P(...GG.gC), 'right', ['BUGNA GENNAKER ' + (curC.g.sheet < refC.g.sheet ? 'PIÙ APERTA' : 'PIÙ CHIUSA'), 'ANGOLO ' + sR.gen.beta.toFixed(0) + '° → ' + sN.gen.beta.toFixed(0) + '°', ...byLines(['g.sheet'])]);
+    if (GU && GG && isMoved('g.tack')) add(P(...GG.gT), 'left', ['MURA GENNAKER ' + (curC.g.tack < refC.g.tack ? 'PIÙ ALTA' : 'PIÙ BASSA'), curC.g.tack < refC.g.tack ? 'INFERITURA PIÙ LIBERA' : 'INFERITURA PIÙ TESA']);
+    if (!GU && isMoved('j.lead')) add(cp, 'left', ['CARRELLO FIOCCO ' + (curC.j.lead > refC.j.lead ? 'PIÙ AVANTI' : 'PIÙ INDIETRO')], 0.4 * sc);
     placeTags(x, w, h, T, 0.7 * sc);
     x.font = '500 10px ' + css('--mono'); x.fillStyle = css('--muted'); x.textAlign = 'left';
     x.fillText('TRATTEGGIO AMBRA: RIFERIMENTO · DEFORMAZIONI ESAGERATE', 6, h - 8);
   }
 
   function drawSections(cid, sail) {
+    if (sail === 'jib' && cur.d.genUp) {
+      const { x, w, h } = fitCanvas($(cid), 1.25), g = cur.d.gen, names = { ok: 'Regolato', luff: 'Inferitura che si chiude', flog: 'Chiuso: sbatte', stall: 'Cazzato troppo', drag: 'Spinge di resistenza' };
+      x.fillStyle = css('--gen'); x.font = '700 20px ' + css('--display'); x.textAlign = 'left'; x.fillText('GENNAKER A RIVA', 4, 26);
+      x.fillStyle = css('--muted'); x.font = '500 11px ' + css('--mono'); x.fillText('FIOCCO AVVOLTO', 4, 44);
+      const rows = [['Stato', names[g.st]], ['Vento apparente', g.awa.toFixed(0) + '°'], ['Incidenza', g.alpha.toFixed(0) + '°'], ['Resa regolazione', (g.eff * 100).toFixed(0) + '%'], ['Resa mura', (g.effT * 100).toFixed(0) + '%']];
+      rows.forEach(([k, v], i) => { x.fillStyle = css('--muted'); x.font = '500 11px ' + css('--mono'); x.fillText(k.toUpperCase(), 4, 78 + i * 34);
+        x.fillStyle = i === 0 ? stCol(g.st) : css('--ink'); x.font = '700 20px ' + css('--display'); x.fillText(v, 4, 98 + i * 34); });
+      return;
+    }
     const { x, w, h } = fitCanvas($(cid), 1.25), d = cur.d[sail];
     const lx = w * 0.8, ly = 90, cmax = Math.min(h - ly - 26, lx - 8);
     x.strokeStyle = css('--line'); x.setLineDash([3, 4]); x.lineWidth = 1;
@@ -1029,8 +1140,8 @@ function optimizeC(tws, twa, passes = 3) {
   const CERT = { 6: [42.8, 3.14, 4.82, 5.10, 5.30, 5.23], 8: [41.3, 3.81, 5.74, 6.03, 6.26, 6.27], 10: [40.5, 4.33, 6.38, 6.59, 6.75, 6.88],
     12: [39.2, 4.73, 6.73, 6.89, 7.04, 7.18], 14: [38.3, 4.89, 6.89, 7.07, 7.27, 7.35], 16: [38.3, 4.94, 6.94, 7.15, 7.47, 7.62], 20: [39.0, 4.89, 6.96, 7.19, 7.65, 8.11] };
   function computeORC(tws) {
-    const key = tws.toFixed(3); if (key === orcKey) return; orcKey = key;
-    polarORC = []; for (let a = 30; a <= 180; a += 5) polarORC.push([a, solveORC(tws, a).kn]);
+    const key = tws.toFixed(3) + '|' + genOn(); if (key === orcKey) return; orcKey = key;
+    polarORC = []; for (let a = 30; a <= 180; a += 5) polarORC.push([a, solveORC(tws, a, genOn()).kn]);
     const w = Math.round(tws * KN), cw = Object.keys(CERT).map(Number).reduce((p, q) => Math.abs(q - w) < Math.abs(p - w) ? q : p);
     const c = CERT[cw], tw = cw / KN;
     let bv = 0, ba = 0; for (let a = 34; a <= 50; a++) { const v = solveORC(tw, a).kn * Math.cos(a * D2R); if (v > bv) { bv = v; ba = a; } }
@@ -1041,7 +1152,7 @@ function optimizeC(tws, twa, passes = 3) {
   }
   // calcolo dell'ottimo in un thread separato: gli slider restano fluidi
   const workerSrc = document.getElementById('modelSrc').textContent + `
-onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes); postMessage({ id: q.id, twa: q.twa, c: o.c, V: o.V }); };`;
+onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes, q.up); postMessage({ id: q.id, twa: q.twa, c: o.c, V: o.V }); };`;
   function makeWorker(onmsg) {
     try { const w = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' }))); w.onmessage = e => onmsg(e.data); return w; }
     catch (err) { return null; }
@@ -1049,7 +1160,7 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
   // senza worker si ripiega sul calcolo nel thread principale
   function runJob(w, msg, onmsg) {
     if (w) w.postMessage(msg);
-    else setTimeout(() => { const o = optimizeC(msg.tws, msg.twa, msg.passes); onmsg({ id: msg.id, twa: msg.twa, c: o.c, V: o.V }); }, 0);
+    else setTimeout(() => { const o = optimizeC(msg.tws, msg.twa, msg.passes, msg.up); onmsg({ id: msg.id, twa: msg.twa, c: o.c, V: o.V }); }, 0);
   }
   const onPolar = d => {
     if (d.id !== polarGen) return;
@@ -1059,10 +1170,10 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
   };
   let wPolar = makeWorker(onPolar);
   function computePolarOpt(tws) {
-    const key = tws.toFixed(3); if (key === polarKey) return; polarKey = key;
+    const key = tws.toFixed(3) + '|' + genOn(); if (key === polarKey) return; polarKey = key;
     const gen = ++polarGen; polarOpt = [];
     if (wPolar) { wPolar.terminate(); wPolar = makeWorker(onPolar); }
-    polarAngles.forEach(a => runJob(wPolar, { id: gen, tws, twa: a, passes: 2 }, onPolar));
+    polarAngles.forEach(a => runJob(wPolar, { id: gen, tws, twa: a, passes: 2, up: genOn() }, onPolar));
   }
 
   let wantKey = '';
@@ -1072,13 +1183,13 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
   };
   let wPoint = makeWorker(onPoint);
   function runOpt() {
-    const e = env(), key = e.tws.toFixed(3) + '|' + e.twa;
+    const e = env(), key = keyNow();
     if (key === optKey || key === wantKey) return;
     clearTimeout(optTimer);
     optTimer = setTimeout(() => {
       wantKey = key;
       if (wPoint) { wPoint.terminate(); wPoint = makeWorker(onPoint); }
-      runJob(wPoint, { id: key, tws: e.tws, twa: e.twa, passes: 3 }, onPoint);
+      runJob(wPoint, { id: key, tws: e.tws, twa: e.twa, passes: 3, up: genOn() }, onPoint);
     }, 150);
   }
 
@@ -1093,7 +1204,7 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
         topLuff: 'testa troppo aperta: cazza la scotta o il barber', topStall: 'testa troppo chiusa: molla il barber o lasca un filo di scotta',
         aft: 'cazza la drizza del fiocco o il paterazzo', fwd: 'molla la drizza del fiocco' }
     };
-    for (const [k, n] of [['main', 'Randa'], ['jib', 'Fiocco']]) {
+    for (const [k, n] of (r.d.genUp ? [['main', 'Randa']] : [['main', 'Randa'], ['jib', 'Fiocco']])) {
       const d = r.d[k], sec = d.secs, lo = sec.slice(0, 5), hi = sec.slice(6), a = adv[k];
       if (d.clamp) L.push(['info', `<b>${n}:</b> ${k === 'main' ? 'boma contro le sartie' : 'bugna aperta al massimo'}, non si apre oltre. Incidenza ${d.secs[3].alpha.toFixed(0)}°.`]);
       if (k === 'jib' && sec[0].eff < 0.6) L.push(['info', '<b>Fiocco coperto dalla randa:</b> in poppa piena riceve poco vento. A bordo si porta a farfalla con il tangone.']);
@@ -1111,12 +1222,21 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
     if (back >= 2 && r.awa < 90) L.push([r.phi > 18 ? 'info' : 'warn', `<b>La randa prende a collo</b> (backwinding): il canale tra fiocco e randa è stretto. ${r.phi > 18 ? 'Con vento forte va bene: meglio un po’ di collo che troppo sbandamento.' : 'Apri il fiocco (scotta o inner) o porta la randa più al centro.'}`]);
     if (r.phi > 22) L.push(['bad', `<b>Sbandamento ${r.phi.toFixed(0)}°:</b> la barca scarroccia e la pala frena. Depotenzia in quest’ordine: appiattisci (paterazzo, base, cunningham), poi svergola (scotta randa, carrello fiocco indietro), infine scarrella sottovento.`]);
     else if (r.phi > 17 && r.awa < 70) L.push(['warn', `<b>Sbandamento ${r.phi.toFixed(0)}°:</b> al limite. Comincia con paterazzo e cunningham.`]);
+    if (r.d.genUp) {
+      const g = r.d.gen;
+      if (r.awa < 50) L.push(['bad', `<b>Troppo stretto per il gennaker</b> (vento apparente a ${r.awa.toFixed(0)}°): sotto i 50–55° non porta. Poggia, oppure ammainalo e srotola il fiocco.`]);
+      else if (g.st === 'flog') L.push(['bad', '<b>Gennaker chiuso, sbatte:</b> cazza deciso la scotta o poggia.']);
+      else if (g.st === 'luff') L.push(['warn', '<b>Inferitura del gennaker che si chiude:</b> cazza un filo di scotta.']);
+      else if (g.st === 'stall') L.push(['warn', '<b>Gennaker cazzato troppo:</b> lasca finché l’inferitura comincia ad arricciarsi, poi cazza appena.']);
+      if (Math.abs(g.tack / 100 - g.ideal) > 0.4) L.push(['info', g.ideal > g.tack / 100 ? '<b>Mura del gennaker:</b> al lasco stretto cazzala, per tenere tesa l’inferitura.' : '<b>Mura del gennaker:</b> andando larghi lascala, così l’inferitura ruota sopravento e la vela esce dalla copertura della randa.']);
+      if (env().tws * KN > 20) L.push(['warn', '<b>Oltre 20 nodi di vento con il gennaker:</b> al limite per un 9 m, rischio di straorzata. Valuta di ammainarlo.']);
+    } else if (r.awa > 95 && env().tws * KN >= 5 && env().tws * KN <= 18) L.push(['info', '<b>Andatura da gennaker:</b> prova ad alzarlo e confronta la velocità.']);
     if (env().tws * KN < 8 && r.awa < 90) {
       if (curC.bs > 50) L.push(['warn', '<b>Poco vento e paterazzo cazzato:</b> le vele sono troppo piatte. Mollalo per dare grasso.']);
       if (curC.m.vang > 50 && curC.m.sheet < 95) L.push(['warn', '<b>Poco vento e vang teso:</b> la balumina resta chiusa e la testa stalla. Molla il vang e controlla lo svergolamento con scotta e carrello.']);
       if (curC.j.lead < 40) L.push(['info', '<b>Poco vento:</b> porta avanti il carrello del fiocco per dare grasso alla base.']);
     }
-    if (opt && optKey === env().tws.toFixed(3) + '|' + env().twa) {
+    if (opt && optKey === keyNow()) {
       const pct = opt.r.kn > 0.05 ? r.kn / opt.r.kn * 100 : 100;
       if (pct >= 98) L.unshift(['good', `<b>Regolazione quasi ottimale</b> (${pct.toFixed(0)}% della velocità possibile).`]);
     }
@@ -1125,7 +1245,7 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
   }
 
   function table() {
-    if (!opt || optKey !== env().tws.toFixed(3) + '|' + env().twa) { $('cmp').innerHTML = ''; return; }
+    if (!opt || optKey !== keyNow()) { $('cmp').innerHTML = ''; return; }
     const e = env(), base = cur.V, rows = [];
     UI.forEach(u => {
       const uv = getC(curC, u.g, u.k), ov = Math.round(getC(opt.c, u.g, u.k));
@@ -1155,6 +1275,8 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
     chipBox.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', Math.abs(c.dataset.v - e.twa) < 3 ? 'true' : 'false'));
     UI.forEach(u => { $(u.id + 'O').textContent = fmt(u, getC(curC, u.g, u.k)); });
     readout('roM', cur.d.main); readout('roJ', cur.d.jib); syncMini();
+    const gu = !!genOn(); $('genBox').classList.toggle('off', !gu); $('mini_genUp').checked = gu;
+    ['c_gsh', 'c_gtack'].forEach(id => { $(id).disabled = !gu; $('mini_' + id).disabled = !gu; });
     $('iV').innerHTML = cur.kn.toFixed(1) + '<small>kn</small>';
     $('iVs').textContent = posName(e.twa) + ' · ' + e.twa + '°';
     $('iVmg').innerHTML = Math.abs(cur.vmg).toFixed(1) + '<small>kn</small>';
@@ -1163,12 +1285,12 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
     $('iAwa').textContent = 'angolo ' + cur.awa.toFixed(0) + '° dalla prua';
     $('iHeel').innerHTML = cur.phi.toFixed(0) + '<small>°</small>';
     $('iHeelS').textContent = 'spinta ' + Math.round(cur.drive) + ' N';
-    const okOpt = opt && optKey === e.tws.toFixed(3) + '|' + e.twa;
+    const okOpt = opt && optKey === keyNow();
     $('applyOpt').disabled = !okOpt;
     if (okOpt) {
       const pct = opt.r.kn > 0.05 ? Math.min(100, cur.kn / opt.r.kn * 100) : 100;
       $('iPct').innerHTML = pct.toFixed(0) + '<small>%</small>'; $('iBar').style.width = pct + '%';
-      $('iOpt').textContent = 'ottimo ' + opt.r.kn.toFixed(2) + ' · ORC ' + solveORC(e.tws, e.twa).kn.toFixed(2) + ' kn';
+      $('iOpt').textContent = 'ottimo ' + opt.r.kn.toFixed(2) + ' · ORC ' + solveORC(e.tws, e.twa, genOn()).kn.toFixed(2) + ' kn';
     } else { $('iPct').innerHTML = '–<small>%</small>'; $('iOpt').textContent = 'calcolo…'; }
     diagnose(); table();
     computePolarCur(curC, e.tws); computeORC(e.tws); computePolarOpt(e.tws);
@@ -1178,6 +1300,7 @@ onmessage = e => { const q = e.data; const o = optimizeC(q.tws, q.twa, q.passes)
   let raf = 0;
   function update() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { render(); runOpt(); }); }
   ['tws', 'twa'].concat(UI.map(u => u.id)).forEach(id => $(id).addEventListener('input', update));
+  $('genUp').addEventListener('change', update);
   $('applyOpt').onclick = () => { if (opt) { writeC(opt.c); update(); } };
   $('mini_ref').onclick = () => $('setRef').click(); $('mini_reset').onclick = () => $('reset').click();
   $('setRef').onclick = () => { refC = JSON.parse(JSON.stringify(readC())); update(); };
