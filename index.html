@@ -114,6 +114,12 @@ footer p { margin: 0; }
 .ro span { font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--inst-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ro b { font: 600 22px var(--display); color: var(--inst-ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .ctl .hint { font-size: 11.5px; line-height: 1.35; }
+.changes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 8px 14px; }
+.changes li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; font-size: 13px; line-height: 1.35; }
+.changes .nb { width: 22px; height: 22px; border-radius: 50%; background: var(--app); color: var(--surface); font: 700 12px var(--body); display: grid; place-items: center; }
+.changes b { display: block; font-weight: 600; }
+.changes small { color: var(--muted); font-size: 12px; }
+.chg-head { margin: 0; font: 700 16px var(--display); text-transform: uppercase; letter-spacing: .08em; color: var(--app); }
 .toggle { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
 .toggle input { width: 18px; height: 18px; accent-color: var(--gen); margin: 0; }
 .group.off .ctl { opacity: .45; }
@@ -201,6 +207,11 @@ footer p { margin: 0; }
       <canvas id="side" aria-label="Vista laterale della barca con vele e filetti"></canvas>
       <div class="mini" id="mini" role="group" aria-label="Comandi di bordo, copia accanto alla vista laterale"></div>
     </div>
+    <div id="sideChg" hidden>
+      <p class="chg-head">Cosa cambia rispetto al riferimento</p>
+      <p class="sub">Tratteggio ambra: la regolazione di riferimento. Deformazioni esagerate per renderle visibili.</p>
+      <ol class="changes" id="sideChanges"></ol>
+    </div>
     <div class="legend">
       <span><i style="background:var(--ink)"></i>Filetti distesi: flusso attaccato</span>
       <span><i style="background:var(--luff)"></i>Verde che si alza: fileggia, cazza o poggia</span>
@@ -214,6 +225,10 @@ footer p { margin: 0; }
       <h3>Vista dall'alto</h3>
       <p class="sub">Sezioni al piede (pieno) e in testa (tratteggio). I pallini sull'inferitura sono i filetti. Il quadratino è il punto di scotta del fiocco, la barra in pozzetto è il carrello della randa.</p>
       <canvas id="plan" aria-label="Vista dall'alto della barca con vento reale, vento apparente e vele"></canvas>
+      <div id="planChg" hidden>
+        <p class="chg-head">Cosa cambia vista dall'alto</p>
+        <ol class="changes" id="planChanges"></ol>
+      </div>
       <div class="legend">
         <span><i style="background:var(--wind)"></i>Vento reale</span>
         <span><i style="background:var(--app)"></i>Vento apparente</span>
@@ -731,7 +746,8 @@ function optimizeC(tws, twa, passes = 3, up = 0) {
 
   function drawPlan() {
     const { x, w, h } = fitCanvas($('plan'), 0.92), r = cur, s = env();
-    const cx = w * 0.53, cy = h * 0.5, sc = h / 12;
+    // con il gennaker la vista si allarga e scende: in poppa la bugna va oltre la prua e sottovento
+    const cx = w * 0.53, cy = h * (r.d.genUp ? 0.6 : 0.5), sc = h / (r.d.genUp ? 16 : 12);
     const P = (mx, my) => [cx + mx * sc, cy + my * sc];
     x.strokeStyle = css('--line'); x.lineWidth = 1; x.setLineDash([2, 4]);
     x.beginPath(); x.arc(cx, cy, h * 0.46, 0, Math.PI * 2); x.stroke(); x.setLineDash([]);
@@ -821,6 +837,7 @@ function optimizeC(tws, twa, passes = 3, up = 0) {
     x.restore();
     x.fillStyle = css('--muted'); x.font = '500 10px ' + css('--mono'); x.textAlign = 'center'; x.fillText('SBAND. ' + r.phi.toFixed(0) + '°', hx, hy + 22);
     // evidenza nella vista dall'alto: carrello randa, angolo del boma, punto di scotta e apertura del fiocco
+    $('planChanges').innerHTML = ''; $('planChg').hidden = true;
     if (Object.keys(SHORT).some(isMoved)) {
       const rs = rigShape(refC, s.tws, s.twa), T = [];
       const add = (pt, side, lines, rr) => { ring(x, pt, rr || 11); T.push({ px: pt[0], py: pt[1], side, lines }); };
@@ -836,7 +853,7 @@ function optimizeC(tws, twa, passes = 3, up = 0) {
         const jp = sectionPts(...stay, cJ * 0.95, d.jib.secs[0].chordAng, d.jib.secs[0].f, d.jib.secs[0].dp)[30];
         add(jp, 'left', ['FIOCCO PIÙ ' + (d.jib.sh.beta > rs.jib.beta ? 'APERTO' : 'CHIUSO'), rs.jib.beta.toFixed(0) + '° → ' + d.jib.sh.beta.toFixed(0) + '°', ...byLines(['j.sheet', 'j.barber', 'j.inner'])]);
       }
-      placeTags(x, w, h, T, 16);
+      placeTags(x, w, h, T, 11, 'planChanges', true);
     }
   }
 
@@ -866,25 +883,26 @@ function optimizeC(tws, twa, passes = 3, up = 0) {
     names.forEach((n, i) => { const piece = n + (i < names.length - 1 ? ', ' : ''); if ((line + piece).length > 26 && line !== 'DA: ') { out.push(line.trimEnd()); line = '    '; } line += piece; });
     out.push(line); return out.map(s => s.toUpperCase());
   }
-  function ring(x, p, r) { x.strokeStyle = css('--app'); x.lineWidth = 2; x.beginPath(); x.arc(p[0], p[1], r, 0, Math.PI * 2); x.stroke(); }
-  // etichette impilate per lato, senza sovrapporsi, con una linea di richiamo al punto evidenziato
-  function placeTags(x, w, h, items, off) {
-    x.font = '600 11px ' + css('--mono');
-    for (const side of ['left', 'right']) {
-      const list = items.filter(t => t.side === side).sort((a, b) => a.py - b.py);
-      let bottom = 4;
-      list.forEach(t => {
-        const tw = Math.max(...t.lines.map(s => x.measureText(s).width)) + 12, th = t.lines.length * 14 + 8;
-        let lx = side === 'right' ? t.px + off : t.px - off - tw; lx = Math.max(4, Math.min(w - tw - 4, lx));
-        let ly = Math.max(bottom + 6, t.py - th / 2); ly = Math.min(ly, h - th - 4); bottom = ly + th;
-        x.strokeStyle = css('--app'); x.lineWidth = 1; x.beginPath(); x.moveTo(t.px, t.py);
-        x.lineTo(side === 'right' ? lx : lx + tw, ly + th / 2); x.stroke();
-        x.fillStyle = css('--surface'); x.globalAlpha = 0.94; x.fillRect(lx, ly, tw, th); x.globalAlpha = 1;
-        x.strokeStyle = css('--app'); x.lineWidth = 1.2; x.strokeRect(lx, ly, tw, th);
-        x.fillStyle = css('--app'); x.textAlign = 'left';
-        t.lines.forEach((s, i) => { x.font = (i === 0 ? '600 ' : '500 ') + '11px ' + css('--mono'); x.fillText(s, lx + 6, ly + 16 + i * 14); });
-      });
-    }
+  function ring(x, p, r) { x.strokeStyle = css('--app'); x.lineWidth = 1.5; x.beginPath(); x.arc(p[0], p[1], r, 0, Math.PI * 2); x.stroke(); }
+  // nel disegno solo un numero accanto a ogni punto evidenziato; le spiegazioni vanno nell'elenco sotto la vista
+  const sentence = t => { const l = t.trim().toLowerCase(); return l.charAt(0).toUpperCase() + l.slice(1); };
+  function placeTags(x, w, h, items, off, listId, letters) {
+    const box = $(listId), wrap = box.parentElement;
+    items.forEach((t, i) => {
+      const lab = letters ? String.fromCharCode(65 + i) : String(i + 1), r = 10;
+      let bx = t.px + (t.side === 'left' ? -1 : 1) * (off * 0.6 + r), by = t.py - off * 0.6 - r;
+      bx = Math.max(r + 2, Math.min(w - r - 2, bx)); by = Math.max(r + 2, Math.min(h - r - 2, by));
+      x.fillStyle = css('--app'); x.beginPath(); x.arc(bx, by, r, 0, Math.PI * 2); x.fill();
+      x.strokeStyle = css('--surface'); x.lineWidth = 2; x.stroke();
+      x.fillStyle = css('--surface'); x.font = '700 12px ' + css('--body'); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(lab, bx, by + 0.5); x.textBaseline = 'alphabetic';
+      t.lab = lab;
+    });
+    box.innerHTML = items.map(t => {
+      const da = t.lines.filter(l => /^(DA:|\s)/.test(l)).map(l => l.replace(/^DA:\s*/, '').trim()).join(' ');
+      const det = t.lines.slice(1).filter(l => !/^(DA:|\s)/.test(l)).map(sentence).join(' · ');
+      return `<li><span class="nb">${t.lab}</span><div><b>${sentence(t.lines[0])}</b>${det ? det : ''}${da ? `<br><small>Da: ${da.toLowerCase()}</small>` : ''}</div></li>`;
+    }).join('');
+    wrap.hidden = !items.length;
   }
   const pctTxt = v => (v * 100).toFixed(0) + '%';
 
@@ -1049,7 +1067,7 @@ function optimizeC(tws, twa, passes = 3, up = 0) {
     let q = P(...BOW); x.textAlign = 'right'; x.fillText('PRUA', q[0] - 6, q[1] + 4);
     q = P(carX, deckZ(carX)); x.textAlign = 'center'; x.fillStyle = css('--wind'); if (!GU) x.fillText('CARRELLO FIOCCO', q[0], q[1] + 22);
     q = P(tvX, tvZ); x.fillStyle = css('--muted'); x.fillText('SCOTTA RANDA', q[0], q[1] + 38);
-    if (!anyMoved) return;
+    if (!anyMoved) { $('sideChanges').innerHTML = ''; $('sideChg').hidden = true; return; }
     // dove cambia, rispetto alla regolazione di riferimento
     const T = [], add = (pt, side, lines, rr) => { ring(x, pt, rr || 0.55 * sc); T.push({ px: pt[0], py: pt[1], side, lines }); };
     const sN = R.sh, sR = G0.sh;
@@ -1070,9 +1088,7 @@ function optimizeC(tws, twa, passes = 3, up = 0) {
     if (GU && GG && isMoved('g.sheet')) add(P(...GG.gC), 'right', ['BUGNA GENNAKER ' + (curC.g.sheet < refC.g.sheet ? 'PIÙ APERTA' : 'PIÙ CHIUSA'), 'ANGOLO ' + sR.gen.beta.toFixed(0) + '° → ' + sN.gen.beta.toFixed(0) + '°', ...byLines(['g.sheet'])]);
     if (GU && GG && isMoved('g.tack')) add(P(...GG.gT), 'left', ['MURA GENNAKER ' + (curC.g.tack < refC.g.tack ? 'PIÙ ALTA' : 'PIÙ BASSA'), curC.g.tack < refC.g.tack ? 'INFERITURA PIÙ LIBERA' : 'INFERITURA PIÙ TESA']);
     if (!GU && isMoved('j.lead')) add(cp, 'left', ['CARRELLO FIOCCO ' + (curC.j.lead > refC.j.lead ? 'PIÙ AVANTI' : 'PIÙ INDIETRO')], 0.4 * sc);
-    placeTags(x, w, h, T, 0.7 * sc);
-    x.font = '500 10px ' + css('--mono'); x.fillStyle = css('--muted'); x.textAlign = 'left';
-    x.fillText('TRATTEGGIO AMBRA: RIFERIMENTO · DEFORMAZIONI ESAGERATE', 6, h - 8);
+    placeTags(x, w, h, T, 0.55 * sc, 'sideChanges', false);
   }
 
   function drawSections(cid, sail) {
